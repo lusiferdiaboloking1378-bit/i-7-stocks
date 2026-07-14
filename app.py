@@ -744,10 +744,10 @@ if run_scan:
     )
     sym_list = [t[1] for t in tickers]
     data = pd.DataFrame()
-    chunk_count = int(np.ceil(len(sym_list) / 100)) if sym_list else 0
+    chunk_count = int(np.ceil(len(sym_list) / 50)) if sym_list else 0
     start_time = time.perf_counter()
     completed_batches = 0
-    for chunk_idx, chunk in enumerate(chunk_list(sym_list, 100), start=1):
+    for chunk_idx, chunk in enumerate(chunk_list(sym_list, 50), start=1):
         try:
             batch_start = time.perf_counter()
             if chunk_count:
@@ -778,7 +778,7 @@ if run_scan:
         status_ph.markdown("<span style='color:#00FF66; font-family:monospace; font-size:13px;'>[ Scanning complete. Pre-fetching company data in parallel... ]</span>", unsafe_allow_html=True)
         # Pre-warm the get_company_position cache in parallel so the per-stock loop is fast
         from concurrent.futures import ThreadPoolExecutor, as_completed
-        with ThreadPoolExecutor(max_workers=20) as executor:
+        with ThreadPoolExecutor(max_workers=5) as executor:
             futures = {executor.submit(get_company_position, sym): sym for _, sym in tickers}
             for fut in as_completed(futures):
                 try:
